@@ -1,0 +1,53 @@
+This class finds PDF links. Useful for making a digital publication.
+
+It relies on pyPdf
+http://pybrary.net/pyPdf/
+
+I nabbed the _hasExternalLiks function from the interwebs and adapted it for my findExternalLinks function.
+http://trac.egovmon.no/trac/eGovMon/browser/trunk/WAMs/pdf-wam/pdfStructureMixin.py?rev=2188
+
+At some point I hope to rewrite that so that I don't have to have the GPL license in here.
+
+Here is the license for that code:
+#      Copyright 2008-2010 eGovMon
+#      This program is distributed under the terms of the GNU General
+#      Public License.
+#
+#  This file is part of the eGovernment Monitoring
+#  (eGovMon)
+#
+#  eGovMon is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  eGovMon is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with eGovMon; if not, write to the Free Software
+#  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston,
+#  MA 02110-1301 USA
+
+Props to Anand B Pillai, whomever you may be.
+
+The rest of the code is Copyright 2011 10Layer Software Development Pty (Ltd)
+http://10layer.com
+
+The application is licensed by the MIT license
+http://www.opensource.org/licenses/mit-license.php
+
+Example of use:
+
+import pdflinkfinder
+import cjson
+
+pdf=pdflinkfinder.PdfLinkFinder("newconcept.pdf")
+if (pdf.hasExternalLinks()):
+	links=pdf.findExternalLinks()
+print cjson.encode(links)
+
+Example of result (Three pages, an internal link on the first to the second page, and an external link on the third):
+[[{"dest": 1, "pg": 0, "rect": [34, 362, 380, 34], "external": false}], false, [{"dest": "http://www.10layer.com", "pg": 2, "rect": [82, 929, 686, 610], "external": true}]]
