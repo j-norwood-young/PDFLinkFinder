@@ -52,16 +52,16 @@ print cjson.encode(links)
 Example of result (Three pages, an internal link on the first to the second page, and an external link on the third):
 [[{"dest": 1, "pg": 0, "rect": [34, 362, 380, 34], "external": false}], false, [{"dest": "http://www.10layer.com", "pg": 2, "rect": [82, 929, 686, 610], "external": true}]]
 """
-
+__version__="0.1a"
+__author__="Jason Norwood-Young"
+__license__="MIT and GPL2"
 import pyPdf
 
 class PdfLinkFinder:
     """ 
     Finds PDF links, and returns the target and rectangular position. Works for internal and URI links at this point.
     """
-	__version__="0.1a"
-	__author__="Jason Norwood-Young"
-	__license__="MIT and GPL2"
+	
     
     def __init__(self,filename):
         self.filename=filename
