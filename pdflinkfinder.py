@@ -28,7 +28,8 @@ __version__="0.2a"
 __author__="Jason Norwood-Young"
 __license__="MIT"
 import pyPdf
-
+import os.path
+		
 class PdfLinkFinder:
 	""" 
 	Finds PDF links, and returns the target and rectangular position. Works for internal and URI links at this point.
@@ -67,25 +68,28 @@ class PdfLinkFinder:
 		result=[]
 		for annot in pg["/Annots"]:
 			annotobj = annot.getObject()
-			if annotobj['/Subtype'] in ('/Link') or annot.has_key('/URI'):
-				external=True
-				obj=annotobj['/A'].getObject()
-				dest=""
-				if (obj.has_key('/D')):
-					external=False
-					namedDests=self.pdf.getNamedDestinations()
-					dest=namedDests[obj['/D']]['/Page'].getObject()
-					for tmppgnum in range(0, self.numPages):
-						if (dest==self.pdf.flattenedPages[tmppgnum]):
-							dest=tmppgnum
-				if (obj.has_key('/URI')):
-					dest=obj['/URI']
-				rect=annotobj['/Rect']
-				newrect=[]
-				for point in rect:
-					newrect.append(int(point))
-				link={"rect":newrect, "pg":pgnum, "external":external,"dest": dest}
-				result.append(link)
+			try:
+				if annotobj['/Subtype'] in ('/Link') or annot.has_key('/URI'):
+					external=True
+					obj=annotobj['/A'].getObject()
+					dest=""
+					if (obj.has_key('/D')):
+						external=False
+						namedDests=self.pdf.getNamedDestinations()
+						dest=namedDests[obj['/D']]['/Page'].getObject()
+						for tmppgnum in range(0, self.numPages):
+							if (dest==self.pdf.flattenedPages[tmppgnum]):
+								dest=tmppgnum
+					if (obj.has_key('/URI')):
+						dest=obj['/URI']
+					rect=annotobj['/Rect']
+					newrect=[]
+					for point in rect:
+						newrect.append(int(point))
+					link={"rect":newrect, "pg":pgnum, "external":external,"dest": dest}
+					result.append(link)
+			except:
+				pass
 		return result
         
 	def findExternalLinks(self):
@@ -100,4 +104,40 @@ class PdfLinkFinder:
 		for pgnum in range(0, self.numPages):
 			result.append(self._findExternalLinks(pgnum))
 		return result
+		
+	def _findMultimedia(self, pgnum, exportdir):
+		pg = self.pdf.getPage(pgnum)
+		if (pg.has_key("/Annots")==False):
+			return False
+		result=[]
+		for annot in pg["/Annots"]:
+			annotobj = annot.getObject()
+			try:
+				if annotobj.has_key('/RichMediaContent'):
+					rect=annotobj['/Rect']
+					newrect=[]
+					for point in rect:
+						newrect.append(int(point))
+					mmobj=annotobj['/RichMediaContent']['/Assets'].getObject()
+					fstream=mmobj['/Names'][1].getObject()
+					fdata=fstream['/EF']['/F'].getObject()
+					fname=os.path.join(exportdir,mmobj['/Names'][0])
+					viddata=fdata.getData()
+					f=open(fname,"w")
+					f.write(viddata)
+					f.close()
+					mm={"rect":newrect,"filename":mmobj['/Names'][0],"pg":pgnum}
+					result.append(mm)
+			except:
+				pass
+		return result
+				
+	def findMultimedia(self, exportdir="."):
+		"""Finds multimedia on every page, and saves the file
+		"""
+		result=[]
+		for pgnum in range(0, self.numPages):
+			result.append(self._findMultimedia(pgnum, os.path.abspath(exportdir)))
+		return result
+		
 
