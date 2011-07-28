@@ -1,3 +1,12 @@
+*******************************************************
+* NB NB NB!!!
+* 
+* This class has been deprecated by PDF Mine
+*
+* https://github.com/10layer/PDF-Mine
+*
+*******************************************************
+
 This class finds PDF links. Useful for making a digital publication.
 
 It relies on pyPdf
